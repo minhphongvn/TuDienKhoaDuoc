@@ -1,28 +1,62 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <v-app>
+      <nprogress-container></nprogress-container>
+      <router-view />
+      <v-snackbar
+        :color="$store.state.alertType"
+        top
+        v-model="showAlert"
+        :timeout="2000"
+      >
+        <strong>{{ $store.state.alertMsg }}</strong>
+      </v-snackbar>
+      <v-overlay :value="overlay">
+        <v-progress-circular indeterminate size="48"></v-progress-circular>
+      </v-overlay>
+    </v-app>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import auth from "./api/auth.api";
+import NprogressContainer from "vue-nprogress/src/NprogressContainer";
 export default {
-  name: 'App',
   components: {
-    HelloWorld
-  }
-}
+    NprogressContainer,
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler(to) {
+        document.title = to.meta.title || "lhu medict - Từ điển khoa dược";
+      },
+    },
+  },
+  async created() {
+    if (this.$store.state.user.isAuthenticated) {
+      const data = await auth.getUser();
+      this.$store.commit("setUser", data);
+    }
+  },
+  computed: {
+    showAlert: {
+      get() {
+        return this.$store.state.alertOn;
+      },
+      set(value) {
+        this.$store.state.alertOn = value;
+      },
+    },
+    overlay() {
+      return this.$store.state.loading;
+    },
+  },
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss">
+// html {
+//   scroll-behavior: smooth;
+// }
 </style>
