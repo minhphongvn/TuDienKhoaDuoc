@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  // baseURL: "https://lhuexamonline.herokuapp.com",
-  baseURL: "http://localhost:8000",
+  baseURL: process.env.VUE_APP_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
